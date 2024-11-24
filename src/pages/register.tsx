@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import AuthButtons from '@/components/AuthButtons'; // Import the AuthButtons component
 
 type UserRole = 'user' | 'taxi';
 
@@ -96,6 +97,11 @@ export default function Register() {
           </Button>
         </div>
       </form>
+      
+      {/* Add Google sign-in button */}
+      <div className="mt-6">
+        <AuthButtons />
+      </div>
     </div>
   );
 }

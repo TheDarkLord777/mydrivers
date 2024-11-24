@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import AuthButtons from '@/components/AuthButtons';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -19,17 +20,15 @@ export default function Login() {
   const [userRole, setUserRole] = useState('user');
   const router = useRouter();
 
-  const handleSubmit = (e:React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     // Login logic here
-    // If login is successful:
-    if(userRole ==="taxi"){
-      router.push("/taxi-dashboard")
+    if (userRole === 'taxi') {
+      router.push('/taxi-dashboard');
     }
-    if(userRole==="user"){
-      router.push("/dashboard")
+    if (userRole === 'user') {
+      router.push('/dashboard');
     }
-    
   };
 
   return (
@@ -66,7 +65,7 @@ export default function Login() {
 
             <div className="space-y-2">
               <Label>Foydalanuvchi turi</Label>
-              <Select value={userRole} onValueChange={setUserRole} >
+              <Select value={userRole} onValueChange={setUserRole}>
                 <SelectTrigger>
                   <SelectValue placeholder="Foydalanuvchi turini tanlang" />
                 </SelectTrigger>
@@ -92,6 +91,9 @@ export default function Login() {
           </form>
         </CardContent>
       </Card>
+      <div className="mt-4">
+        <AuthButtons />
+      </div>
     </div>
   );
 }
