@@ -2,41 +2,24 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerDefinition from '../../config/swagger';
-import cors from 'cors';
-
-// CORS middleware
-const corsMiddleware = cors({
-  methods: ['GET', 'HEAD'],
-});
 
 const options = {
   definition: swaggerDefinition,
-  apis: ['./src/pages/api/**/*.ts'], // API route fayllarining yo'li
+  apis: ['./pages/api/**/*.ts'],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // CORS ni handle qilish
-  await new Promise((resolve, reject) => {
-    corsMiddleware(req, res, (result) => {
-      if (result instanceof Error) {
-        return reject(result);
-      }
-      return resolve(result);
-    });
-  });
-
-  if (req.method === 'GET') {
+  try {
+    // CORS headerlarini qo'shish
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET');
     res.setHeader('Content-Type', 'application/json');
+
     res.status(200).json(swaggerSpec);
-  } else {
-    res.status(405).json({ message: 'Method not allowed' });
+  } catch (error) {
+    console.error('Swagger error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 }
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
