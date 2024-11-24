@@ -5,7 +5,7 @@ import swaggerDefinition from '../../config/swagger';
 
 const options = {
   definition: swaggerDefinition,
-  apis: ['./pages/api/**/*.ts'],
+  apis: ['./src/pages/api/**/*.ts'],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
