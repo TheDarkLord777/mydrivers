@@ -52,3 +52,80 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 export default handler;
+
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: Foydalanuvchilar bilan ishlash
+ */
+
+/**
+ * @swagger
+ * /api/data:
+ *   get:
+ *     summary: Foydalanuvchilar ro‘yxatini olish
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: Foydalanuvchilar ro‘yxati muvaffaqiyatli qaytarildi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   username:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ *       500:
+ *         description: Server xatosi
+ *   post:
+ *     summary: Yangi foydalanuvchi qo‘shish
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: JohnDoe
+ *               email:
+ *                 type: string
+ *                 example: johndoe@example.com
+ *               password:
+ *                 type: string
+ *                 example: StrongPassword123
+ *     responses:
+ *       201:
+ *         description: Foydalanuvchi muvaffaqiyatli qo‘shildi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     username:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *       400:
+ *         description: Noto‘g‘ri so‘rov
+ *       409:
+ *         description: Email mavjud
+ *       500:
+ *         description: Server xatosi
+ */
