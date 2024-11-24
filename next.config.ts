@@ -1,7 +1,10 @@
-import type { NextConfig } from 'next'
- 
+import type { NextConfig } from 'next';
+
 const nextConfig: NextConfig = {
   /* config options here */
-}
- 
-export default nextConfig
+  env: {
+    BASE_URL: process.env.BASE_URL || 'http://localhost:3000',
+  },
+};
+
+export default nextConfig;

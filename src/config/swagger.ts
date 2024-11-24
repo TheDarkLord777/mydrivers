@@ -9,7 +9,7 @@ const swaggerDefinition: SwaggerDefinition = {
   },
   servers: [
     {
-      url: 'http://localhost:3000', // Asosiy API bazaviy URL
+      url: process.env.BASE_URL, 
     },
   ],
 };
