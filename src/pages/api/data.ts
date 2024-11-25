@@ -9,7 +9,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       const result = await client.query('SELECT * FROM users');  // users jadvalidan ma'lumot olish
       res.status(200).json(result.rows);  // Natijalarni JSON formatida qaytarish
-    } catch (err) {
+    } catch (error) {
       res.status(500).json({ error: 'Foydalanuvchilarni olishda xatolik' });  // Xato bo'lsa xabar yuborish
     } finally {
       await client.end();  // DB ulanishini yopish
