@@ -5,7 +5,10 @@ import swaggerDefinition from '../../config/swagger';
 
 const options = {
   definition: swaggerDefinition,
-  apis: ['./src/pages/api/**/*.ts'],
+  apis: [
+    './pages/api/**/*.ts',  // barcha API fayllar
+    './src/pages/api/data.ts'  // qo'shimcha API fayl
+  ],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
