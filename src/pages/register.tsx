@@ -7,8 +7,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import AuthButtons from '@/components/AuthButtons'; // Import the AuthButtons component
+} from '@/components/ui/select';
+import AuthButtons from '@/components/auth/AuthButtons'; // Import the AuthButtons component
 
 type UserRole = 'user' | 'taxi';
 
@@ -18,7 +18,7 @@ export default function Register() {
     name: '',
     email: '',
     password: '',
-    phone: ''
+    phone: '',
   });
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -30,9 +30,9 @@ export default function Register() {
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -44,7 +44,7 @@ export default function Register() {
     <div className="flex items-center justify-center min-h-screen bg-blue-900">
       <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Ro'yxatdan o'tish</h2>
-        
+
         <div className="space-y-4">
           <Input
             type="text"
@@ -54,7 +54,7 @@ export default function Register() {
             onChange={handleInputChange}
             required
           />
-          
+
           <Input
             type="email"
             name="email"
@@ -63,7 +63,7 @@ export default function Register() {
             onChange={handleInputChange}
             required
           />
-          
+
           <Input
             type="password"
             name="password"
@@ -72,7 +72,7 @@ export default function Register() {
             onChange={handleInputChange}
             required
           />
-          
+
           <Input
             type="tel"
             name="phone"
@@ -81,7 +81,7 @@ export default function Register() {
             onChange={handleInputChange}
             required
           />
-          
+
           <Select value={userRole} onValueChange={handleRoleChange}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Foydalanuvchi turini tanlang" />
@@ -97,7 +97,7 @@ export default function Register() {
           </Button>
         </div>
       </form>
-      
+
       {/* Add Google sign-in button */}
       <div className="mt-6">
         <AuthButtons />

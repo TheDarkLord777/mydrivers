@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import AuthButtons from '@/components/AuthButtons';
+import AuthButtons from '@/components/auth/AuthButtons';
 
 export default function Login() {
   const [email, setEmail] = useState('');
