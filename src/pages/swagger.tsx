@@ -1,9 +1,8 @@
-// pages/swagger.tsx
+// src/pages/swagger.tsx
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import 'swagger-ui-react/swagger-ui.css';
 
-// SwaggerUI ni dynamic import qilish
 const SwaggerUI = dynamic(() => import('swagger-ui-react'), {
   ssr: false,
   loading: () => <div>Loading Swagger UI...</div>
@@ -21,7 +20,7 @@ const SwaggerPage = () => {
   return (
     <div className="swagger-container">
       <SwaggerUI url="/api/swagger" />
-      <style jsx global>{`
+      <style>{`
         .swagger-ui .info {
           margin: 20px 0;
         }
