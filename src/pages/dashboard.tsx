@@ -1,9 +1,15 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 // import { Input } from '@/components/ui/input';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, Phone, Clock, Users } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { MapPin, Phone, Clock, Users } from "lucide-react";
 
 // Define interfaces for type safety
 interface Taxi {
@@ -14,21 +20,41 @@ interface Taxi {
 }
 
 const cities: string[] = [
-  "Toshkent", "Samarqand", "Buxoro", "Andijon", "Farg'ona", "Namangan",
-  "Qashqadaryo", "Surxondaryo", "Xorazm", "Navoiy", "Jizzax", "Sirdaryo"
+  "Toshkent",
+  "Samarqand",
+  "Buxoro",
+  "Andijon",
+  "Farg'ona",
+  "Namangan",
+  "Qashqadaryo",
+  "Surxondaryo",
+  "Xorazm",
+  "Navoiy",
+  "Jizzax",
+  "Sirdaryo",
 ];
 
 export default function Dashboard() {
-  const [selectedCity, setSelectedCity] = useState<string>('');
-  const [fromCity, setFromCity] = useState<string>('');
+  const [selectedCity, setSelectedCity] = useState<string>("");
+  const [fromCity, setFromCity] = useState<string>("");
   const [taxis, setTaxis] = useState<Taxi[]>([]);
 
   const handleCitySelect = (city: string): void => {
     setSelectedCity(city);
     // Mock taxi data
     setTaxis([
-      { id: 1, number: 'AA 1234 BB', phone: '+998 90 123 45 67', departureTime: '14:00' },
-      { id: 2, number: 'AA 5678 BB', phone: '+998 90 234 56 78', departureTime: '15:30' },
+      {
+        id: 1,
+        number: "AA 123 B",
+        phone: "+998 90 123 45 67",
+        departureTime: "14:00",
+      },
+      {
+        id: 2,
+        number: "AA 567 B",
+        phone: "+998 90 234 56 78",
+        departureTime: "15:30",
+      },
     ]);
   };
 
@@ -44,7 +70,7 @@ export default function Dashboard() {
             <div className="space-y-4">
               <h2 className="text-lg font-semibold">Shaharlar</h2>
               <div className="flex flex-wrap gap-2">
-                {cities.map(city => (
+                {cities.map((city) => (
                   <Button
                     key={city}
                     variant={selectedCity === city ? "default" : "outline"}
@@ -65,7 +91,7 @@ export default function Dashboard() {
                   <SelectValue placeholder="Shahar tanlang" />
                 </SelectTrigger>
                 <SelectContent>
-                  {cities.map(city => (
+                  {cities.map((city) => (
                     <SelectItem key={city} value={city}>
                       {city}
                     </SelectItem>
@@ -77,16 +103,35 @@ export default function Dashboard() {
 
           {/* Taxi List */}
           <div className="mt-8">
-            <h2 className="text-lg font-semibold mb-4">Taksiler</h2>
+            <h2 className="text-lg font-semibold mb-4">Taksilar</h2>
             <div className="grid gap-4">
-              {taxis.map(taxi => (
+              {taxis.map((taxi) => (
                 <Card key={taxi.id}>
                   <CardContent className="pt-6">
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
                           <MapPin className="w-4 h-4" />
-                          <span className="font-medium">Raqam: {taxi.number}</span>
+                          <div className="inline-flex items-center justify-center border-4 border-black rounded-lg bg-white p-1 w-[220px]">
+                            <div className="flex items-center gap-2">
+                              <div className="flex flex-col items-center">
+                                <div className="w-6 h-4 flex flex-col">
+                                  <div className="h-[33%] bg-[#0099B5]"></div>
+                                  <div className="h-[33%] bg-white"></div>
+                                  <div className="h-[33%] bg-[#1EB53A]"></div>
+                                  {/* Qizil chiziqlar */}
+                                  <div className="h-[2px] bg-[#CE1126] absolute mt-[5px] w-6"></div>
+                                  <div className="h-[2px] bg-[#CE1126] absolute mt-[9px] w-6"></div>
+                                </div>
+                                
+                              </div>
+
+                              {/* Raqam */}
+                              <span className="font-bold text-xl px-2">
+                                {taxi.number}
+                              </span>
+                            </div>
+                          </div>
                         </div>
                         <div className="flex items-center gap-2">
                           <Phone className="w-4 h-4" />
@@ -106,7 +151,7 @@ export default function Dashboard() {
                               <SelectValue placeholder="0" />
                             </SelectTrigger>
                             <SelectContent>
-                              {[1, 2, 3, 4].map(num => (
+                              {[1, 2, 3, 4].map((num) => (
                                 <SelectItem key={num} value={num.toString()}>
                                   {num}
                                 </SelectItem>

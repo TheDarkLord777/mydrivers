@@ -5,6 +5,8 @@ export default function Document() {
     <Html>
       <Head>
         <title>My Drivers</title>
+        <meta name="description" content="My Drivers" />
+        <link rel="shortcut icon" href="vite.svg" type="image/x-icon" />
       </Head>
       <body>
         <Main />
