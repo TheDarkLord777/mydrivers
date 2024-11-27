@@ -1,39 +1,75 @@
-import { useState, FormEvent, ChangeEvent } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { useState, FormEvent, ChangeEvent } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import AuthButtons from '@/components/auth/AuthButtons'; // Import the AuthButtons component
+} from "@/components/ui/select";
+import AuthButtons from "@/components/auth/AuthButtons"; // Import the AuthButtons component
+import BackButton from "@/components/BackButton";
 
-type UserRole = 'user' | 'taxi';
+type UserRole = "user" | "taxi";
 
 export default function Register() {
-  const [userRole, setUserRole] = useState<UserRole>('user');
+  const [userRole, setUserRole] = useState<UserRole>("user");
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    phone: '',
+    name: "",
+    email: "",
+    password: "",
+    phone: "",
   });
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Registration logic here
     console.log({ ...formData, userRole });
-    window.location.href = '/login';
+    window.location.href = "/login";
   };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    if (name === "phone") {
+      // Agar +998 dan boshlansa va foydalanuvchi uni o'zgartirmoqchi bo'lsa
+      if (value.length < 4) {
+        return; // +998 ni o'chirish imkonini bermaymiz
+      }
+      // Faqat raqamlarni qabul qilamiz
+      const numericValue = value.replace(/\D/g, "");
+
+      // Raqamni formatlash
+      let formattedValue = "+998";
+      if (numericValue.length > 3) {
+        formattedValue += " " + numericValue.slice(3, 6);
+        if (numericValue.length > 6) {
+          formattedValue += " " + numericValue.slice(6, 8);
+          if (numericValue.length > 8) {
+            formattedValue += " " + numericValue.slice(8, 10);
+          }
+        }
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        [name]: formattedValue,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
+  const handlePhoneFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (!formData.phone.startsWith("+998")) {
+      setFormData((prev) => ({
+        ...prev,
+        phone: "+998",
+      }));
+    }
   };
 
   const handleRoleChange = (value: string) => {
@@ -42,8 +78,13 @@ export default function Register() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-blue-900">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Ro'yxatdan o'tish</h2>
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md"
+      >
+        <h2 className="text-2xl font-bold mb-6 text-center">
+          Ro'yxatdan o'tish
+        </h2>
 
         <div className="space-y-4">
           <Input
@@ -79,6 +120,8 @@ export default function Register() {
             placeholder="Telefon raqam"
             value={formData.phone}
             onChange={handleInputChange}
+            onFocus={handlePhoneFocus}
+            maxLength={16}
             required
           />
 
@@ -99,8 +142,11 @@ export default function Register() {
       </form>
 
       {/* Add Google sign-in button */}
-      <div className="mt-6">
+      <div className="mt-4">
         <AuthButtons />
+        <div className="mt-2">
+          <BackButton />
+        </div>
       </div>
     </div>
   );

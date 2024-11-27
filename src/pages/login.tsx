@@ -13,6 +13,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AuthButtons from '@/components/auth/AuthButtons';
+import BackButton from '@/components/BackButton';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -92,8 +93,16 @@ export default function Login() {
         </CardContent>
       </Card>
       <div className="mt-4">
-        <AuthButtons />
-      </div>
+      <AuthButtons />
+        <div className="mt-2">
+        <BackButton />
+        </div>
+        
+       
+        </div>
+        
+        
+      
     </div>
   );
 }

@@ -1,4 +1,3 @@
-// src/pages/api/users.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import { connectDb } from '../../services/db';
 
@@ -65,7 +64,6 @@ import { connectDb } from '../../services/db';
  *       required:
  *         - username
  *         - email
- *         - password
  *       properties:
  *         username:
  *           type: string
@@ -133,9 +131,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   } else if (req.method === 'POST') {
     const { username, email, password } = req.body;
 
-    if (!username || !email || !password) {
+    if (!username || !email) {
       return res.status(400).json({ 
-        error: "Barcha maydonlar to'ldirilishi shart: username, email, password" 
+        error: "Barcha maydonlar to'ldirilishi shart: username, email" 
       });
     }
 
@@ -150,7 +148,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const result = await client.query(`
         INSERT INTO users (username, email, password, created_at)
         VALUES ($1, $2, $3, CURRENT_TIMESTAMP) RETURNING *;
-      `, [username, email, password]);
+      `, [username, email, password || '']);
 
       res.status(201).json({
         message: "Foydalanuvchi muvaffaqiyatli qo'shildi",
