@@ -1,16 +1,22 @@
-import { useState, useEffect } from "react";
-import { signInWithPopup, onAuthStateChanged, signOut, User } from "firebase/auth";
-import { auth, googleProvider } from "../config/firebaseConfig";
+import { useEffect,useState } from 'react';
+import { signInWithPopup, onAuthStateChanged, signOut, User } from 'firebase/auth';
+import { auth, googleProvider } from '../config/firebaseConfig';
+import { useAuthStore } from '../store/useAuthStore';
 
 export const useAuth = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isSigningIn, setIsSigningIn] = useState(false);
+  const { user, isSigningIn, setUser, setIsSigningIn, setAuthLoading } = useAuthStore();
+  const [authLoading, setLocalAuthLoading] = useState(true);
 
   useEffect(() => {
+    // Set initial loading state
+    setAuthLoading(true);
+    
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+      setAuthLoading(false);
+      setLocalAuthLoading(false);
+      
       if (currentUser) {
-        // Send user data to server to store in PostgreSQL
         try {
           const response = await fetch('/api/users', {
             method: 'POST',
@@ -20,7 +26,7 @@ export const useAuth = () => {
             body: JSON.stringify({
               username: currentUser.displayName,
               email: currentUser.email,
-              password: '' // You may want to handle passwords differently
+              password: ''
             })
           });
           if (!response.ok) {
@@ -31,11 +37,15 @@ export const useAuth = () => {
         }
       }
     });
-    return unsubscribe;
-  }, []);
+
+    return () => {
+      unsubscribe();
+    };
+  }, [setUser, setAuthLoading]);
 
   const signInWithGoogle = async () => {
     if (isSigningIn) return;
+    
     setIsSigningIn(true);
     try {
       await signInWithPopup(auth, googleProvider);
@@ -49,10 +59,16 @@ export const useAuth = () => {
   const logout = async () => {
     try {
       await signOut(auth);
+      setUser(null); // Explicitly clear the user state
     } catch (error) {
       console.error("Error during sign-out:", error);
     }
   };
 
-  return { user, signInWithGoogle, logout };
+  return { 
+    user, 
+    signInWithGoogle, 
+    logout, 
+    authLoading: authLoading || isSigningIn 
+  };
 };
