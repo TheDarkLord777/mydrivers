@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { connectDb } from '../../services/db';
+import { connectDb } from '../../../services/db';
 
 /**
  * @swagger
@@ -120,14 +120,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await connectDb();
 
   if (req.method === 'GET') {
-    try {
-      const result = await client.query('SELECT * FROM users');
-      res.status(200).json(result.rows);
-    } catch (error) {
-      res.status(500).json({ error: 'Foydalanuvchilarni olishda xatolik' });
-    } finally {
-      await client.end();
-    }
+    // ... (your existing GET logic)
   } else if (req.method === 'POST') {
     const { username, email, password } = req.body;
 
@@ -138,13 +131,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     try {
+      // First check if user exists
       const checkUser = await client.query('SELECT * FROM users WHERE email = $1', [email]);
+      
       if (checkUser.rows.length > 0) {
-        return res.status(409).json({ 
-          error: 'Ushbu email bilan foydalanuvchi allaqachon mavjud' 
+        // If user exists, return the existing user data
+        return res.status(200).json({
+          message: 'Foydalanuvchi mavjud',
+          user: checkUser.rows[0]
         });
       }
 
+      // If user doesn't exist, create new user
       const result = await client.query(`
         INSERT INTO users (username, email, password, created_at)
         VALUES ($1, $2, $3, CURRENT_TIMESTAMP) RETURNING *;

@@ -8,36 +8,44 @@ export const useAuth = () => {
   const [authLoading, setLocalAuthLoading] = useState(true);
 
   useEffect(() => {
-    // Set initial loading state
     setAuthLoading(true);
     
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-      setAuthLoading(false);
-      setLocalAuthLoading(false);
-      
       if (currentUser) {
         try {
-          const response = await fetch('/api/users', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              username: currentUser.displayName,
-              email: currentUser.email,
-              password: ''
-            })
-          });
-          if (!response.ok) {
-            throw new Error('Failed to save user data');
+          // Check if user exists
+          const checkResponse = await fetch(`/api/users/check?email=${currentUser.email}`);
+          const checkData = await checkResponse.json();
+          
+          if (!checkData.exists) {
+            // Only create if user doesn't exist
+            const response = await fetch('/api/users', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                username: currentUser.displayName,
+                email: currentUser.email,
+                password: ''
+              })
+            });
+            if (!response.ok) {
+              throw new Error('Failed to save user data');
+            }
           }
+          // Set user state regardless of whether user was created or already existed
+          setUser(currentUser);
         } catch (error) {
-          console.error('Error saving user data:', error);
+          console.error('Error handling user data:', error);
         }
+      } else {
+        setUser(null);
       }
+      setAuthLoading(false);
+      setLocalAuthLoading(false);
     });
-
+  
     return () => {
       unsubscribe();
     };

@@ -3,8 +3,9 @@ import type { AppProps } from "next/app";
 import ClickEffect from "@/components/ClickEffect";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
-import { Car } from 'lucide-react'
+import { Car } from "lucide-react";
 import { useEffect, useState } from "react";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const { user, authLoading } = useAuth();
@@ -20,7 +21,10 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     }, 5000); // 5 second timeout
 
     if (!authLoading) {
-      if (user === null && !["/", "/login", "/register"].includes(router.pathname)) {
+      if (
+        user === null &&
+        !["/", "/login", "/register"].includes(router.pathname)
+      ) {
         router.push("/");
       } else {
         setPageLoading(false);
@@ -39,9 +43,9 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   }
 
   return (
-    <>
+    <ErrorBoundary>
       <ClickEffect />
       <Component {...pageProps} />
-    </>
+    </ErrorBoundary>
   );
 }
