@@ -63,7 +63,7 @@ export default function Register() {
     }
   };
 
-  const handlePhoneFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+  const handlePhoneFocus = () => {
     if (!formData.phone.startsWith("+998")) {
       setFormData((prev) => ({
         ...prev,
