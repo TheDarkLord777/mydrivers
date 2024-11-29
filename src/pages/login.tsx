@@ -14,21 +14,49 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AuthButtons from '@/components/auth/AuthButtons';
 import BackButton from '@/components/BackButton';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [userRole, setUserRole] = useState('user');
+  const [error, setError] = useState<string | null>(null);  // Error state to manage feedback
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  // Store dan userRole ni olish
+  const { userRole, setUserRole } = useAuthStore();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Login logic here
-    if (userRole === 'taxi') {
-      router.push('/taxi-dashboard');
-    }
-    if (userRole === 'user') {
-      router.push('/dashboard');
+    try {
+      setError(null);  // Clear previous errors
+      // Login logikasi
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, role: userRole }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Login failed');
+      }
+
+      const data = await response.json();
+
+      // User ma'lumotlarini store ga saqlash
+      useAuthStore.getState().setUser(data.user);
+
+      // Role ga qarab yo'naltirish
+      if (userRole === 'taxi') {
+        router.push('/taxi-dashboard');
+      } else {
+        router.push('/dashboard');
+      }
+      
+    } catch (error: any) {
+      console.error('Login error:', error);
+      setError('Login xatolik yuz berdi, iltimos qayta urinib ko\'ring'); // Set error message
     }
   };
 
@@ -66,7 +94,10 @@ export default function Login() {
 
             <div className="space-y-2">
               <Label>Foydalanuvchi turi</Label>
-              <Select value={userRole} onValueChange={setUserRole}>
+              <Select
+                value={userRole || 'user'}
+                onValueChange={(value: 'user' | 'taxi') => setUserRole(value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Foydalanuvchi turini tanlang" />
                 </SelectTrigger>
@@ -76,6 +107,10 @@ export default function Login() {
                 </SelectContent>
               </Select>
             </div>
+
+            {error && (
+              <div className="text-red-500 text-center mt-2">{error}</div> // Error message display
+            )}
 
             <Button type="submit" className="w-full">
               Kirish
@@ -93,16 +128,11 @@ export default function Login() {
         </CardContent>
       </Card>
       <div className="mt-4">
-      <AuthButtons />
+        <AuthButtons />
         <div className="mt-2">
-        <BackButton />
+          <BackButton />
         </div>
-        
-       
-        </div>
-        
-        
-      
+      </div>
     </div>
   );
 }

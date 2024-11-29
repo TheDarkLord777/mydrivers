@@ -1,6 +1,7 @@
 import { useState, FormEvent, ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useRouter } from "next/router";
 import {
   Select,
   SelectContent,
@@ -9,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import AuthButtons from "@/components/auth/AuthButtons"; // Import the AuthButtons component
-import BackButton from "@/components/BackButton";
+import BackButton from "@/components/BackButton"; // Import BackButton component
 
 type UserRole = "user" | "taxi";
 
@@ -21,12 +22,35 @@ export default function Register() {
     password: "",
     phone: "",
   });
+  const router = useRouter();
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Registration logic here
-    console.log({ ...formData, userRole });
-    window.location.href = "/login";
+
+    // Send the form data to the server
+    try {
+      const response = await fetch("/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...formData, userRole }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // On successful registration, redirect to login page
+        router.push("/login");
+      } else {
+        // Handle errors from the server
+        alert(data.error || "Xatolik yuz berdi");
+      }
+    } catch (error) {
+      // Handle errors if the fetch fails
+      console.error("Error:", error);
+      alert("Ro'yxatdan o'tishda xatolik yuz berdi.");
+    }
   };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {

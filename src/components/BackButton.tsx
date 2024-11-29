@@ -6,7 +6,7 @@ const BackButton: React.FC = () => {
   const router = useRouter();
 
   const handleClick = () => {
-    router.back();
+    router.push("/");
   };
 
   return (

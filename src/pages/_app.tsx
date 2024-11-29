@@ -3,47 +3,60 @@ import type { AppProps } from "next/app";
 import ClickEffect from "@/components/ClickEffect";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
+import { useMemo,useCallback } from "react";
 import { Car } from "lucide-react";
 import { useEffect, useState } from "react";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import ErrorFallback from "@/components/ErrorFallback";
+
+
+
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const { user, authLoading } = useAuth();
   const router = useRouter();
   const [pageLoading, setPageLoading] = useState(true);
+  
 
-  useEffect(() => {
-    // Add a timeout to prevent infinite loading
-    const timeoutId = setTimeout(() => {
-      if (authLoading) {
-        setPageLoading(false);
-      }
-    }, 5000); // 5 second timeout
 
+  // Memoize router.pathname to prevent unnecessary re-renders
+  const currentPath = useMemo(() => router.pathname, [router.pathname]);
+
+  // Use useCallback for handler functions
+  const handleRouteChange = useCallback(() => {
     if (!authLoading) {
       if (
         user === null &&
-        !["/", "/login", "/register"].includes(router.pathname)
+        !["/", "/login", "/register"].includes(currentPath)
       ) {
         router.push("/");
       } else {
         setPageLoading(false);
       }
     }
+    
+    
+  }, [user, currentPath, authLoading, router]);
+
+  useEffect(() => {
+    // Optimize timeout handling
+    const timeoutId = setTimeout(handleRouteChange, 5000);
+    handleRouteChange();
 
     return () => clearTimeout(timeoutId);
-  }, [user, router.pathname, authLoading]);
+  }, [handleRouteChange]);
 
+  // Consider using a more lightweight loading indicator
   if (authLoading || pageLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-blue-900">
-        <Car className="w-20 h-20 text-white animate-pulse" />
+      <div className="fixed inset-0 flex items-center justify-center bg-blue-900/90">
+        <Car className="w-16 h-16 text-white animate-bounce" />
       </div>
     );
   }
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary fallback={<ErrorFallback />}>
       <ClickEffect />
       <Component {...pageProps} />
     </ErrorBoundary>
