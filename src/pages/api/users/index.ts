@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { connectDb } from '../../../services/db';
+import { connectDb } from '@/services/db';
 
 /**
  * @swagger

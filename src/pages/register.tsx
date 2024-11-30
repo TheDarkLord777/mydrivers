@@ -29,7 +29,7 @@ export default function Register() {
 
     // Send the form data to the server
     try {
-      const response = await fetch("/api/users", {
+      const response = await fetch("/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

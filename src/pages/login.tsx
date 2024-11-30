@@ -30,7 +30,7 @@ export default function Login() {
     try {
       setError(null);  // Clear previous errors
       // Login logikasi
-      const response = await fetch('/api/users', {
+      const response = await fetch('/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -122,6 +122,7 @@ export default function Login() {
                 className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
               >
                 Parolni unutdingizmi?
+                
               </Link>
             </div>
           </form>
