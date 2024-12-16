@@ -65,7 +65,7 @@ export default function handler(
     // GET - Foydalanuvchi rolini olish
     if (req.method === 'GET') {
       const stmt = db.prepare('SELECT role FROM users WHERE email = ?');
-      const result = stmt.get(email);
+      const result = stmt.get(email) as { role: string } | undefined;
 
       if (!result) {
         return res.status(404).json({ 
