@@ -1,6 +1,5 @@
-// pages/api/users/check.ts
 import { NextApiRequest, NextApiResponse } from 'next';
-import { connectDb } from '../../../services/db';
+import { openDB } from '@/lib/db'; // Adjust the path if necessary
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -8,18 +7,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const { email } = req.query;
-  const client = await connectDb();
+
+  if (!email) {
+    return res.status(400).json({ error: 'Email kiritilishi shart' });
+  }
+
+  const db = openDB();
 
   try {
-    const result = await client.query('SELECT * FROM users WHERE email = $1', [email]);
+    const stmt = db.prepare('SELECT * FROM users WHERE email = ?');
+    const user = stmt.get(email);
+
     return res.status(200).json({ 
-      exists: result.rows.length > 0,
-      user: result.rows[0] || null
+      exists: !!user,
+      user: user || null
     });
   } catch (error) {
     console.error('DB Xatolik:', error);
     return res.status(500).json({ error: 'Foydalanuvchini tekshirishda xatolik' });
   } finally {
-    await client.end();
+    db.close();
   }
 }

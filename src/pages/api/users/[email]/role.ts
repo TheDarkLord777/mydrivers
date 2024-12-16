@@ -1,6 +1,5 @@
-// pages/api/users/[email]/role.ts
 import { NextApiRequest, NextApiResponse } from 'next';
-import { connectDb } from '../../../../services/db';
+import { openDB } from '@/lib/db';
 
 /**
  * @swagger
@@ -51,29 +50,31 @@ import { connectDb } from '../../../../services/db';
  *         description: Server xatosi
  */
 
-export default async function handler(
+export default function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   const { email } = req.query;
-  const client = await connectDb();
+  if (typeof email !== 'string') {
+    return res.status(400).json({ error: 'Email parameter is required and must be a string' });
+  }
+
+  const db = openDB();
 
   try {
     // GET - Foydalanuvchi rolini olish
     if (req.method === 'GET') {
-      const result = await client.query(
-        'SELECT role FROM users WHERE email = $1',
-        [email]
-      );
+      const stmt = db.prepare('SELECT role FROM users WHERE email = ?');
+      const result = stmt.get(email);
 
-      if (result.rows.length === 0) {
+      if (!result) {
         return res.status(404).json({ 
           error: 'Foydalanuvchi topilmadi' 
         });
       }
 
       return res.status(200).json({ 
-        role: result.rows[0].role || 'user'
+        role: result.role || 'user'
       });
     }
 
@@ -89,30 +90,32 @@ export default async function handler(
       }
 
       // Avval foydalanuvchi mavjudligini tekshirish
-      const checkUser = await client.query(
-        'SELECT * FROM users WHERE email = $1',
-        [email]
-      );
+      const checkUserStmt = db.prepare('SELECT * FROM users WHERE email = ?');
+      const checkUser = checkUserStmt.get(email);
 
-      if (checkUser.rows.length === 0) {
+      if (!checkUser) {
         return res.status(404).json({ 
           error: 'Foydalanuvchi topilmadi' 
         });
       }
 
       // Rolni yangilash
-      const result = await client.query(
+      const updateUserStmt = db.prepare(
         `UPDATE users 
-         SET role = $1, 
+         SET role = ?, 
              updated_at = CURRENT_TIMESTAMP 
-         WHERE email = $2 
-         RETURNING *`,
-        [role, email]
+         WHERE email = ?`
       );
+      const info = updateUserStmt.run(role, email);
+
+      if (info.changes === 0) {
+        return res.status(500).json({
+          error: 'Foydalanuvchi roli yangilanmadi'
+        });
+      }
 
       return res.status(200).json({
-        message: 'Foydalanuvchi roli muvaffaqiyatli yangilandi',
-        user: result.rows[0]
+        message: 'Foydalanuvchi roli muvaffaqiyatli yangilandi'
       });
     }
 
@@ -127,6 +130,6 @@ export default async function handler(
       error: 'Server xatosi yuz berdi' 
     });
   } finally {
-    await client.end();
+    db.close();
   }
 }

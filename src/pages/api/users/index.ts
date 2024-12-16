@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { connectDb } from '@/services/db';
+import { openDB } from '@/lib/db';
 
 /**
  * @swagger
@@ -117,12 +117,12 @@ import { connectDb } from '@/services/db';
  */
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const client = await connectDb();
+  const db = openDB();
 
   if (req.method === 'POST') {
     const { name, email, password, phone, userRole } = req.body;
 
-    if (!email || !password) {
+    if (!email || !password || !name) {
       return res.status(400).json({
         error: "Barcha maydonlar to'ldirilishi shart: name, email, password"
       });
@@ -130,9 +130,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     try {
       // Check if user already exists by email
-      const checkUser = await client.query('SELECT * FROM users WHERE email = $1', [email]);
+      const checkUser = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
 
-      if (checkUser.rows.length > 0) {
+      if (checkUser) {
         return res.status(409).json({
           error: "Ushbu email bilan foydalanuvchi allaqachon mavjud"
         });
@@ -141,35 +141,38 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const userRoleToUse = userRole || 'user';  // Default to 'user' if no role is provided
 
       // Insert new user
-      const result = await client.query(
+      const stmt = db.prepare(
         `INSERT INTO users (username, email, password, phone_number, role, created_at)
-         VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP) RETURNING *;`,
-        [name, email, password, phone, userRoleToUse]
+         VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP);`
       );
+      const result = stmt.run(name, email, password, phone, userRoleToUse);
+
+      // Fetch the inserted user using lastInsertRowid
+      const newUser = db.prepare('SELECT * FROM users WHERE id = ?').get(result.lastInsertRowid);
 
       res.status(201).json({
         message: "Foydalanuvchi muvaffaqiyatli qo'shildi",
-        user: result.rows[0]
+        user: newUser
       });
     } catch (error) {
       console.error('DB Error:', error);
       res.status(500).json({ error: "Foydalanuvchi qo'shishda xatolik" });
     } finally {
-      await client.end();
+      db.close();
     }
 
   } else if (req.method === 'GET') {
     try {
       // Retrieve all users
-      const result = await client.query('SELECT * FROM users');
-      const users = result.rows;
+      const stmt = db.prepare('SELECT * FROM users');
+      const users = stmt.all();
 
       res.status(200).json(users);
     } catch (error) {
       console.error('DB Error:', error);
       res.status(500).json({ error: "Foydalanuvchilarni olishda xatolik" });
     } finally {
-      await client.end();
+      db.close();
     }
 
   } else {

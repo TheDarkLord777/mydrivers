@@ -93,20 +93,21 @@ export default function Login() {
             </div>
 
             <div className="space-y-2">
-              <Label>Foydalanuvchi turi</Label>
-              <Select
-                value={userRole || 'user'}
-                onValueChange={(value: 'user' | 'taxi') => setUserRole(value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Foydalanuvchi turini tanlang" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="user">Foydalanuvchi</SelectItem>
-                  <SelectItem value="taxi">Taksi haydovchisi</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+  <Label>Foydalanuvchi turi</Label>
+  <Select
+    value={userRole || 'user'}
+    onValueChange={(value: 'user' | 'taxi' | 'admin') => setUserRole(value)}
+  >
+    <SelectTrigger>
+      <SelectValue placeholder="Foydalanuvchi turini tanlang" />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="user">Foydalanuvchi</SelectItem>
+      <SelectItem value="taxi">Taksi haydovchisi</SelectItem>
+      <SelectItem value="admin">Admin</SelectItem>
+    </SelectContent>
+  </Select>
+</div>
 
             {error && (
               <div className="text-red-500 text-center mt-2">{error}</div> // Error message display

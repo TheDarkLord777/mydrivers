@@ -13,11 +13,11 @@ const getUserRole = async (email: string) => {
 };
 
 // Yangi foydalanuvchini yaratish
-const createNewUser = async (username: string, email: string) => {
+const createNewUser = async (username: string, email: string, password: string, phone: string) => {
   const response = await fetch('/api/users', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, email, role: 'user' }),
+    body: JSON.stringify({ name: username, email, password, phone, userRole: 'user' }),
   });
   if (!response.ok) throw new Error('Yangi foydalanuvchini yaratishda xatolik');
   const { user } = await response.json();
@@ -42,7 +42,7 @@ export const useAuth = () => {
 
           if (!checkData.exists) {
             // Create user and get role
-            role = await createNewUser(currentUser.displayName!, currentUser.email!);
+            role = await createNewUser(currentUser.displayName!, currentUser.email!, 'defaultPassword', 'defaultPhone');
           } else {
             // Get existing role
             role = await getUserRole(currentUser.email!);
@@ -70,12 +70,12 @@ export const useAuth = () => {
   const signInWithGoogle = async () => {
     if (isSigningIn) return;
     setIsSigningIn(true);
-
+  
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const role = await getUserRole(result.user.email!);
       setUserRole(role);
-
+  
       router.push(role === 'taxi' ? '/taxi-dashboard' : '/dashboard');
     } catch (error) {
       console.error('Sign-in error:', error);

@@ -45,6 +45,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
     return () => clearTimeout(timeoutId);
   }, [handleRouteChange]);
+  
+  
 
   // Consider using a more lightweight loading indicator
   if (authLoading || pageLoading) {

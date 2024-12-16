@@ -4,11 +4,11 @@ import { User } from "firebase/auth";
 
 interface AuthState {
   user: User | null;
-  userRole: 'user' | 'taxi' | null;
+  userRole: 'user' | 'taxi'|'admin' | null;
   isSigningIn: boolean;
   authLoading: boolean;
   setUser: (user: User | null) => void;
-  setUserRole: (role: 'user' | 'taxi' | null) => void;
+  setUserRole: (role: 'user' | 'taxi' | 'admin'| null) => void;
   setIsSigningIn: (isSigningIn: boolean) => void;
   setAuthLoading: (loading: boolean) => void;
   reset: () => void;
