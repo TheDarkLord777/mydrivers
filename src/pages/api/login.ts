@@ -1,9 +1,15 @@
-// /api/login.ts
 import { NextApiRequest, NextApiResponse } from 'next';
-import { connectDb } from '@/services/db';
+import { openDB } from '@/lib/db';
+import bcrypt from 'bcrypt';
+
+type User = {
+  email: string;
+  password: string;
+  // Add any other fields relevant to the User type
+};
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const client = await connectDb();
+  const db = openDB();
 
   if (req.method === 'POST') {
     const { email, password } = req.body;
@@ -14,21 +20,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       });
     }
     
-
     try {
       // Foydalanuvchini tekshirish
-      const checkUser = await client.query('SELECT * FROM users WHERE email = $1', [email]);
+      const stmt = db.prepare('SELECT * FROM users WHERE email = ?');
+      const user = stmt.get(email) as User | undefined;
 
-      if (checkUser.rows.length === 0) {
+      if (!user) {
         return res.status(404).json({
           error: "Foydalanuvchi topilmadi"
         });
       }
 
-      const user = checkUser.rows[0];
-
       // Parolni tekshirish
-      if (user.password !== password) {
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (!passwordMatch) {
         return res.status(401).json({
           error: "Noto'g'ri parol"
         });
@@ -43,7 +48,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       console.error('DB Error:', error);
       res.status(500).json({ error: "Kirishda xatolik yuz berdi" });
     } finally {
-      await client.end();
+      db.close();
     }
   } else {
     res.status(405).json({ error: 'Metod yaroqsiz' });
@@ -51,4 +56,3 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 export default handler;
-
