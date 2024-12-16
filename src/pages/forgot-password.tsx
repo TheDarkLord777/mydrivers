@@ -24,7 +24,7 @@ export default function ForgotPassword() {
     try {
       await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulating API call
       setIsSuccess(true);
-    } catch (err) {
+    } catch {
       setError("Xatolik yuz berdi. Iltimos, qayta urinib ko'ring.");
     } finally {
       setIsLoading(false);
